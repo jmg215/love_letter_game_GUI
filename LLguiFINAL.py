@@ -289,7 +289,9 @@ class MainWin(QMainWindow):
         TOP.addLayout(LHS)
         TOP.addLayout(RHS)
         
-        
+        #FIXME: re-enable the discard slots on the GUI. then add discards in the StartNewRound() method
+
+
         """Bottom Row 1 subGUI for MainWin. contains the discarded cards.max discards set to 4 for now??"""
         self.discardlabel = QLineEdit()
         self.discardlabel.setText('\nCard Set Aside')
@@ -329,9 +331,9 @@ class MainWin(QMainWindow):
         B1 = QGridLayout()
         B1.addWidget(self.discardlabel,1,1)
         B1.addWidget(self.discard1,1,2)
-        #B1.addWidget(self.discard2,1,3)
-        #B1.addWidget(self.discard3,1,4)
-        #B1.addWidget(self.discard4,1,5)
+        B1.addWidget(self.discard2,1,3)
+        B1.addWidget(self.discard3,1,4)
+        B1.addWidget(self.discard4,1,5)
         
 
         
@@ -438,19 +440,34 @@ class MainWin(QMainWindow):
         self.new_game = GameKeeper()
         self.new_game.shuffle()
         #print(self.new_game.gamers[0].player_name)
-        CardToDiscard = random.randint(0, 14)
-        self.new_game.player_cards[CardToDiscard].dealt_status = True
-        self.new_game.num_cards_dealt = 1
-        #######create a new attribute to new_game. the cards that are discarded
+        
+        
+        #######    NEW STUFF
         self.new_game.discarded_cards = []
-        self.new_game.discarded_cards.append(self.new_game.player_cards[CardToDiscard])
+        a = 0
+        while a < 4:
+            pick_me = random.randint(0,14)
+            if self.new_game.player_cards[pick_me].dealt_status == False:
+                self.new_game.player_cards[pick_me].dealt_status = True
+                self.new_game.discarded_cards.append(self.new_game.player_cards[pick_me])
+                a = a + 1
+            else:
+                pick_me = random.randint(0,14)
         
-        #self.new_game.deal(0)
-        #self.new_game.deal(0)
-        #self.new_game.deal(1)
         
-        #self.new_game.deal(1)
-        print(self.new_game.player_cards[CardToDiscard].card_name + ' discarded?: ' + str(self.new_game.player_cards[CardToDiscard].dealt_status))
+        
+        # CardToDiscard = random.randint(0, 14)
+        # self.new_game.player_cards[CardToDiscard].dealt_status = True
+        # self.new_game.num_cards_dealt = 1
+        # #######create a new attribute to new_game. the cards that are discarded
+        # self.new_game.discarded_cards = []
+        # self.new_game.discarded_cards.append(self.new_game.player_cards[CardToDiscard])
+        #print(self.new_game.player_cards[CardToDiscard].card_name + ' set aside?: ' + str(self.new_game.player_cards[CardToDiscard].dealt_status))
+        print(self.new_game.discarded_cards[0].card_name + ' set aside?: ' + str(self.new_game.discarded_cards[0].dealt_status))
+        print(self.new_game.discarded_cards[1].card_name + ' set face up?: ' + str(self.new_game.discarded_cards[1].dealt_status))
+        print(self.new_game.discarded_cards[2].card_name + ' set face up?: ' + str(self.new_game.discarded_cards[2].dealt_status))
+        print(self.new_game.discarded_cards[3].card_name + ' set face up?: ' + str(self.new_game.discarded_cards[3].dealt_status))
+        
         self.new_game.deal(0)
         #self.new_game.deal(0)
         self.new_game.deal(1)
@@ -465,8 +482,30 @@ class MainWin(QMainWindow):
             #self.show()
         #print(self.new_game.player_cards[CardToDiscard].card_name + '.png')
         #self.discard1pix = QPixmap(self.new_game.player_cards[CardToDiscard].card_name + '.png')
+        
+        
+        
+        
+
+        #####      NEW STUFF. deal the 3 cards face up for the two player game. 
+        #deal 3 cards face up along side the set aside card (which is face down)
         self.discard1pix = QPixmap(self.new_game.discarded_cards[0].card_name + '.png')
+        self.discard2pix = QPixmap(self.new_game.discarded_cards[1].card_name + '.png')
+        self.discard3pix = QPixmap(self.new_game.discarded_cards[2].card_name + '.png')
+        self.discard4pix = QPixmap(self.new_game.discarded_cards[3].card_name + '.png')
+
+        # never set this to true. set the others to to
         #self.discard1.setPixmap(self.discard1pix)
+        # set to true when ready
+        self.discard2.setPixmap(self.discard2pix)
+        self.discard3.setPixmap(self.discard3pix)
+        self.discard4.setPixmap(self.discard4pix)
+        
+        
+        
+        
+        
+        
         self.round_indicator.setText('Current Round: 1')
         
         #changed to take in last love letter written argument for start of game
@@ -490,6 +529,7 @@ class MainWin(QMainWindow):
     
             
     def StartNewRound(self):
+        """initiates a new round of love letter"""
         self.new_game.round_number = self.new_game.round_number + 1
         rounders = str('Current Round: ') + str(self.new_game.round_number)
         self.round_indicator.setText(rounders)
@@ -506,21 +546,55 @@ class MainWin(QMainWindow):
         for i in range(2):
             self.new_game.gamers[i].hand.clear()
             
+        #: face up 3 card 
         #CLEAR THE DISCARDED CARDS PILE
         self.new_game.discarded_cards.clear()
-        CardToDiscard = random.randint(0, 14)
-        self.new_game.player_cards[CardToDiscard].dealt_status = True
+        a = 0
+        while a < 4:
+            pick_me = random.randint(0,14)
+            if self.new_game.player_cards[pick_me].dealt_status == False:
+                self.new_game.player_cards[pick_me].dealt_status = True
+                self.new_game.discarded_cards.append(self.new_game.player_cards[pick_me])
+                a = a + 1
+            else:
+                pick_me = random.randint(0,14)
+                
+        print(self.new_game.discarded_cards[0].card_name + ' set aside?: ' + str(self.new_game.discarded_cards[0].dealt_status))
+        print(self.new_game.discarded_cards[1].card_name + ' set face up?: ' + str(self.new_game.discarded_cards[1].dealt_status))
+        print(self.new_game.discarded_cards[2].card_name + ' set face up?: ' + str(self.new_game.discarded_cards[2].dealt_status))
+        print(self.new_game.discarded_cards[3].card_name + ' set face up?: ' + str(self.new_game.discarded_cards[3].dealt_status))
+        
+        
+        
+        #CardToDiscard1 = random.randint(0, 14)
+
+        #self.new_game.player_cards[CardToDiscard1].dealt_status = True
+
         
         #DEAL NEW CARDS TO THE PLAYERS
         self.new_game.deal(0)
         self.new_game.deal(1)
         #CardToDiscard = random.randint(0, 14)
         #self.new_game.player_cards[CardToDiscard].dealt_status = True
-        print(self.new_game.player_cards[CardToDiscard].card_name + ' dealt status: ' + str(self.new_game.player_cards[CardToDiscard].dealt_status))
+        #print(self.new_game.player_cards[CardToDiscard1].card_name + ' set aside : ' + str(self.new_game.player_cards[CardToDiscard1].dealt_status))
         #
-        self.new_game.discarded_cards.append(self.new_game.player_cards[CardToDiscard])
-        self.discard1pix = QPixmap(self.new_game.discarded_cards[0].card_name + '.png')
+        
+        #self.new_game.discarded_cards.append(self.new_game.player_cards[CardToDiscard1])
+        
+        
+        
+        #: deal 3 cards face up along side the set aside card (which is face down)
+        #self.discard1pix = QPixmap(self.new_game.discarded_cards[0].card_name + '.png')
+        self.discard2pix = QPixmap(self.new_game.discarded_cards[1].card_name + '.png')
+        self.discard3pix = QPixmap(self.new_game.discarded_cards[2].card_name + '.png')
+        self.discard4pix = QPixmap(self.new_game.discarded_cards[3].card_name + '.png')
+
+        
+        #: never set this to true. set the others to to
         #self.discard1.setPixmap(self.discard1pix)
+        self.discard2.setPixmap(self.discard2pix)
+        self.discard3.setPixmap(self.discard3pix)
+        self.discard4.setPixmap(self.discard4pix)
 
         #print(self.new_game.gamers[0].hand[0])
         
@@ -592,7 +666,15 @@ class MainWin(QMainWindow):
                 self.P1taketurn.setEnabled(False)
                 self.P2taketurn.setEnabled((True))
         else:
-            print('ran out of cards yo')
+            print('draw the aside card')
+            self.new_game.gamers[0].hand.append(self.new_game.discarded_cards[0])
+            self.P1_card_played.cards_to_pass(self.new_game.gamers[0].hand)
+            self.P1_card_played.showandtell()
+            #self.P1_card_played.submitted1[int].connect(self.onSubmitted1)
+            self.P1_card_played.submitted1[object].connect(self.onSubmitted1)
+            if self.P1taketurn.clicked:
+                self.P1taketurn.setEnabled(False)
+                self.P2taketurn.setEnabled((True))
 
     
     def player2taketurn(self):
@@ -602,7 +684,7 @@ class MainWin(QMainWindow):
 
         
         if self.new_game.num_cards_dealt <=15:
-        #FIXME:this place. might be referring to the dealt aside card??
+
             self.new_game.deal(1)
             self.P2_card_played = FormWindowP2()
             self.P2_card_played.cards_to_pass(self.new_game.gamers[1].hand)
@@ -614,6 +696,16 @@ class MainWin(QMainWindow):
                 self.P1taketurn.setEnabled(True)
         else:
             print('ran out of cards yo')
+            self.new_game.gamers[1].hand.append(self.new_game.discarded_cards[0])
+            self.P2_card_played = FormWindowP2()
+            self.P2_card_played.cards_to_pass(self.new_game.gamers[1].hand)
+            self.P2_card_played.showandtell()
+            #self.P1_card_played.submitted1[int].connect(self.onSubmitted1)
+            self.P2_card_played.submitted2[object].connect(self.onSubmitted2)
+            if self.P2taketurn.clicked:
+                self.P2taketurn.setEnabled(False)
+                self.P1taketurn.setEnabled(True)
+            
     
     def Card_Evaluation(self,card_in_question,sender,recursive = False):
         """the most important aspect of the game. evaluate the card played 
@@ -887,7 +979,7 @@ class MainWin(QMainWindow):
                 self.guess.submitted3[str].connect(self.onSubmitted3)
                 self.last_guard_guess = sender
             else:
-                if self.last_guard_guess == 1:
+                if self.last_guard_guess == 1 and self.new_game.gamers[1].protected_status == False:
                     if card_in_question == self.new_game.gamers[1].hand[0].card_name:
                         result = 'Round Result: '+'round is over. P1 wins. P1 guesses P2 hand correctly'
                         self.result_indicator.setText(result)
@@ -901,7 +993,7 @@ class MainWin(QMainWindow):
                     else:
                         pass
                     
-                elif self.last_guard_guess == 2:
+                elif self.last_guard_guess == 2 and self.new_game.gamers[0].protected_status == False:
                     if card_in_question == self.new_game.gamers[0].hand[0].card_name:
                         result = 'Round Result: '+'round is over. P2 wins. P2 giesses P1 hand correctly'
                         self.result_indicator.setText(result)
@@ -913,6 +1005,12 @@ class MainWin(QMainWindow):
                         self.P2taketurn.setEnabled(False) 
                     else:
                         pass
+                elif self.last_guard_guess == 1 and self.new_game.gamers[1].protected_status == True:
+                    pass
+                elif self.last_guard_guess == 2 and self.new_game.gamers[0].protected_status == True:
+                    pass
+                else:
+                    pass
                         
                 #     #works if 2 consecuive guard are played and king selected. does not work concurrently
                 #     print('THATS WHAT I APPRECIATES ABOUT YOU SQUIRELY DAN')
@@ -933,6 +1031,7 @@ class MainWin(QMainWindow):
             WINNER = QMessageBox()
             WINNER.setText('PLAYER 1 WINS')
             WINNER.exec()
+            
         elif self.new_game.gamers[1].tokens == 6:
             self.P1taketurn.setEnabled(False)
             self.P2taketurn.setEnabled(False)
@@ -941,6 +1040,7 @@ class MainWin(QMainWindow):
             WINNER = QMessageBox()
             WINNER.setText('PLAYER 2 WINS')
             WINNER.exec()
+            
         else:
             pass
             
@@ -1331,11 +1431,11 @@ class FormWindow3(QtWidgets.QTabWidget):
         self.layout.addWidget(self.handmaid_button)
         self.layout.addWidget(self.priest_button)
         self.layout.addWidget(self.baron_button)
-        self.layout.addWidget(self.guard_button)
+        #self.layout.addWidget(self.guard_button)
         self.setLayout(self.layout)
         self.show()
         
-        self.give_back = ''
+
 
     def king(self):
         self.submitted3[str].emit('king')
